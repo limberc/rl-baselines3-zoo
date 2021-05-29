@@ -14,9 +14,8 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize
-
 # For custom activation fn
-from torch import nn as nn  # noqa: F401 pylint: disable=unused-import
+from torch import nn  # noqa: F401 pylint: disable=unused-import
 
 ALGOS = {
     "a2c": A2C,
@@ -169,14 +168,14 @@ def get_callback_list(hyperparams: Dict[str, Any]) -> List[BaseCallback]:
 
 
 def create_test_env(
-    env_id: str,
-    n_envs: int = 1,
-    stats_path: Optional[str] = None,
-    seed: int = 0,
-    log_dir: Optional[str] = None,
-    should_render: bool = True,
-    hyperparams: Optional[Dict[str, Any]] = None,
-    env_kwargs: Optional[Dict[str, Any]] = None,
+        env_id: str,
+        n_envs: int = 1,
+        stats_path: Optional[str] = None,
+        seed: int = 0,
+        log_dir: Optional[str] = None,
+        should_render: bool = True,
+        hyperparams: Optional[Dict[str, Any]] = None,
+        env_kwargs: Optional[Dict[str, Any]] = None,
 ) -> VecEnv:
     """
     Create environment for testing a trained agent
@@ -299,9 +298,9 @@ def get_latest_run_id(log_path: str, env_id: str) -> int:
 
 
 def get_saved_hyperparams(
-    stats_path: str,
-    norm_reward: bool = False,
-    test_mode: bool = False,
+        stats_path: str,
+        norm_reward: bool = False,
+        test_mode: bool = False,
 ) -> Tuple[Dict[str, Any], str]:
     """
     :param stats_path:
