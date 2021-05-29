@@ -102,7 +102,8 @@ if __name__ == "__main__":  # noqa: C901
     registered_envs = set(gym.envs.registry.env_specs.keys())  # pytype: disable=module-attr
 
     # If the environment is not found, suggest the closest match
-    if env_id not in registered_envs:
+    # if env_id not in registered_envs:
+    if not len([key for key in registered_envs if env_id in key]):
         try:
             closest_match = difflib.get_close_matches(env_id, registered_envs, n=1)[0]
         except IndexError:
