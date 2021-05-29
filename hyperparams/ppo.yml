@@ -12,7 +12,19 @@ atari:
   clip_range: lin_0.1
   vf_coef: 0.5
   ent_coef: 0.01
-
+procgen:
+  # borrow the config from the https://github.com/openai/train-procgen/blob/master/train_procgen/train.py
+  env_wrapper:
+    - stable_baselines3.common.procgen_wrappers.procgen_wrapper
+  n_envs: 8
+  n_steps: 256
+  n_epochs: 3
+  batch_size: 256
+  n_timesteps: !!float 1e7
+  learning_rate: lin_5e-4
+  clip_range: lin_0.2
+  vf_coef: 0.5
+  ent_coef: 0.01
 Pendulum-v0:
   n_envs: 8
   n_timesteps: !!float 2e6
