@@ -9,6 +9,7 @@ import numpy as np
 import seaborn
 import torch
 from stable_baselines3.common.utils import set_random_seed
+import procgen
 
 # Register custom envs
 import utils.import_envs  # noqa: F401 pytype: disable=import-error
