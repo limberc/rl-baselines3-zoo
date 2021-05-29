@@ -17,7 +17,7 @@ from optuna.samplers import BaseSampler, RandomSampler, TPESampler
 from stable_baselines3 import HerReplayBuffer  # noqa: F401
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, EvalCallback
-from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.env_util import make_atari_env, make_vec_env
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 from stable_baselines3.common.preprocessing import is_image_space, is_image_space_channels_first
 from stable_baselines3.common.procgen_wrappers import procgen_wrapper
@@ -490,6 +490,8 @@ class ExperimentManager:
         if self._is_procgen:
             env = procgen_wrapper(num_envs=n_envs,
                                   env_name=self.env_id)
+        elif self._is_atari:
+            env = make_atari_env(self.env_id, n_envs=n_envs, seed=self.seed)
         else:
             env = make_vec_env(
                 env_id=self.env_id,
