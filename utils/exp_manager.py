@@ -13,7 +13,6 @@ import yaml
 from optuna.integration.skopt import SkoptSampler
 from optuna.pruners import BasePruner, MedianPruner, SuccessiveHalvingPruner
 from optuna.samplers import BaseSampler, RandomSampler, TPESampler
-
 # For using HER with GoalEnv
 from stable_baselines3 import HerReplayBuffer  # noqa: F401
 from stable_baselines3.common.base_class import BaseAlgorithm
@@ -23,10 +22,10 @@ from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckA
 from stable_baselines3.common.preprocessing import is_image_space, is_image_space_channels_first
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.utils import constant_fn
-from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize, VecTransposeImage
-
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize, \
+    VecTransposeImage
 # For custom activation fn
-from torch import nn as nn  # noqa: F401
+from torch import nn  # noqa: F401
 
 # Register custom envs
 import utils.import_envs  # noqa: F401 pytype: disable=import-error
@@ -35,7 +34,7 @@ from utils.hyperparams_opt import HYPERPARAMS_SAMPLER
 from utils.utils import ALGOS, get_callback_list, get_latest_run_id, get_wrapper_class, linear_schedule
 
 
-class ExperimentManager(object):
+class ExperimentManager:
     """
     Experiment manager: read the hyperparameters,
     preprocess them, create the environment and the RL model.
@@ -43,37 +42,35 @@ class ExperimentManager(object):
     Please take a look at `train.py` to have the details for each argument.
     """
 
-    def __init__(
-        self,
-        args: argparse.Namespace,
-        algo: str,
-        env_id: str,
-        log_folder: str,
-        tensorboard_log: str = "",
-        n_timesteps: int = 0,
-        eval_freq: int = 10000,
-        n_eval_episodes: int = 5,
-        save_freq: int = -1,
-        hyperparams: Optional[Dict[str, Any]] = None,
-        env_kwargs: Optional[Dict[str, Any]] = None,
-        trained_agent: str = "",
-        optimize_hyperparameters: bool = False,
-        storage: Optional[str] = None,
-        study_name: Optional[str] = None,
-        n_trials: int = 1,
-        n_jobs: int = 1,
-        sampler: str = "tpe",
-        pruner: str = "median",
-        n_startup_trials: int = 0,
-        n_evaluations: int = 1,
-        truncate_last_trajectory: bool = False,
-        uuid_str: str = "",
-        seed: int = 0,
-        log_interval: int = 0,
-        save_replay_buffer: bool = False,
-        verbose: int = 1,
-        vec_env_type: str = "dummy",
-    ):
+    def __init__(self,
+                 args: argparse.Namespace,
+                 algo: str,
+                 env_id: str,
+                 log_folder: str,
+                 tensorboard_log: str = "",
+                 n_timesteps: int = 0,
+                 eval_freq: int = 10000,
+                 n_eval_episodes: int = 5,
+                 save_freq: int = -1,
+                 hyperparams: Optional[Dict[str, Any]] = None,
+                 env_kwargs: Optional[Dict[str, Any]] = None,
+                 trained_agent: str = "",
+                 optimize_hyperparameters: bool = False,
+                 storage: Optional[str] = None,
+                 study_name: Optional[str] = None,
+                 n_trials: int = 1,
+                 n_jobs: int = 1,
+                 sampler: str = "tpe",
+                 pruner: str = "median",
+                 n_startup_trials: int = 0,
+                 n_evaluations: int = 1,
+                 truncate_last_trajectory: bool = False,
+                 uuid_str: str = "",
+                 seed: int = 0,
+                 log_interval: int = 0,
+                 save_replay_buffer: bool = False,
+                 verbose: int = 1,
+                 vec_env_type: str = "dummy"):
         super(ExperimentManager, self).__init__()
         self.algo = algo
         self.env_id = env_id
@@ -107,6 +104,7 @@ class ExperimentManager(object):
         self.truncate_last_trajectory = truncate_last_trajectory
 
         self._is_atari = self.is_atari(env_id)
+        self._is_procgen = self.is_procgen(env_id)
         # Hyperparameter optimization config
         self.optimize_hyperparameters = optimize_hyperparameters
         self.storage = storage
@@ -237,6 +235,8 @@ class ExperimentManager(object):
                 hyperparams = hyperparams_dict[self.env_id]
             elif self._is_atari:
                 hyperparams = hyperparams_dict["atari"]
+            elif self._is_procgen:
+                hyperparams = hyperparams_dict['procgen']
             else:
                 raise ValueError(f"Hyperparameters not found for {self.algo}-{self.env_id}")
 
@@ -291,7 +291,7 @@ class ExperimentManager(object):
         return hyperparams
 
     def _preprocess_hyperparams(
-        self, hyperparams: Dict[str, Any]
+            self, hyperparams: Dict[str, Any]
     ) -> Tuple[Dict[str, Any], Optional[Callable], List[BaseCallback]]:
         self.n_envs = hyperparams.get("n_envs", 1)
 
@@ -343,7 +343,7 @@ class ExperimentManager(object):
         return hyperparams, env_wrapper, callbacks
 
     def _preprocess_action_noise(
-        self, hyperparams: Dict[str, Any], saved_hyperparams: Dict[str, Any], env: VecEnv
+            self, hyperparams: Dict[str, Any], saved_hyperparams: Dict[str, Any], env: VecEnv
     ) -> Dict[str, Any]:
         # Parse noise string
         if self.algo in ["ddpg", "sac", "td3", "tqc"] and hyperparams.get("noise_type") is not None:
@@ -422,6 +422,10 @@ class ExperimentManager(object):
     @staticmethod
     def is_robotics_env(env_id: str) -> bool:
         return "gym.envs.robotics" in gym.envs.registry.env_specs[env_id].entry_point
+
+    @staticmethod
+    def is_procgen(env_id: str) -> bool:
+        return "procgen.gym_registration" in gym.envs.registry.env_specs[env_id].entry_point
 
     def _maybe_normalize(self, env: VecEnv, eval_env: bool) -> VecEnv:
         """
