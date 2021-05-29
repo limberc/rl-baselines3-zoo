@@ -9,7 +9,6 @@ import numpy as np
 import seaborn
 import torch
 from stable_baselines3.common.utils import set_random_seed
-import procgen
 
 # Register custom envs
 import utils.import_envs  # noqa: F401 pytype: disable=import-error
@@ -23,7 +22,7 @@ if __name__ == "__main__":  # noqa: C901
     parser.add_argument("--algo", help="RL Algorithm", default="ppo", type=str, required=False,
                         choices=list(ALGOS.keys()))
     parser.add_argument("--env", type=str, default="CartPole-v1", help="environment ID")
-    parser.add_argument("-tb", "--tensorboard-log", help="Tensorboard log dir", default="", type=str)
+    parser.add_argument("-tb", "--tensorboard-log", help="Tensorboard log dir", default="logs/tb_logs/", type=str)
     parser.add_argument("-i", "--trained-agent", help="Path to a pretrained agent to continue training", default="",
                         type=str)
     parser.add_argument("--truncate-last-trajectory",
@@ -32,13 +31,12 @@ if __name__ == "__main__":  # noqa: C901
                         default=True,
                         type=bool)
     parser.add_argument("-n", "--n-timesteps", help="Overwrite the number of timesteps", default=-1, type=int)
-    parser.add_argument("--num-threads", help="Number of threads for PyTorch (-1 to use default)", default=-1, type=int)
+    parser.add_argument("--num-threads", help="Number of threads for PyTorch (-1 to use default)", default=32, type=int)
     parser.add_argument("--log-interval", help="Override log interval (default: -1, no change)", default=-1, type=int)
-    parser.add_argument(
-        "--eval-freq", help="Evaluate the agent every n steps (if negative, no evaluation)", default=10000, type=int
-    )
-    parser.add_argument("--eval-episodes", help="Number of episodes to use for evaluation", default=5, type=int)
-    parser.add_argument("--save-freq", help="Save the model every n steps (if negative, no checkpoint)", default=-1,
+    parser.add_argument("--eval-freq", help="Evaluate the agent every n steps (if negative, no evaluation)",
+                        default=10000, type=int)
+    parser.add_argument("--eval-episodes", help="Number of episodes to use for evaluation", default=10, type=int)
+    parser.add_argument("--save-freq", help="Save the model every n steps (if negative, no checkpoint)", default=200,
                         type=int)
     parser.add_argument(
         "--save-replay-buffer", help="Save the replay buffer too (when applicable)", action="store_true", default=False
