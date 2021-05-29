@@ -20,7 +20,7 @@ from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback,
 from stable_baselines3.common.env_util import make_atari_env, make_vec_env
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 from stable_baselines3.common.preprocessing import is_image_space, is_image_space_channels_first
-from stable_baselines3.common.procgen_wrappers import procgen_wrapper
+from stable_baselines3.common.procgen_wrappers import make_procgen_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.utils import constant_fn
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize, \
@@ -488,8 +488,7 @@ class ExperimentManager:
         # On most env, SubprocVecEnv does not help and is quite memory hungry
         # therefore we use DummyVecEnv by default
         if self._is_procgen:
-            env = procgen_wrapper(num_envs=n_envs,
-                                  env_name=self.env_id)
+            env = make_procgen_env(n_envs, self.env_id)
         elif self._is_atari:
             env = make_atari_env(self.env_id, n_envs=n_envs, seed=self.seed)
         else:
