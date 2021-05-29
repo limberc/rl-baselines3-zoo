@@ -18,6 +18,7 @@ procgen:
   n_steps: 256
   n_epochs: 3
   batch_size: 256
+  policy: 'CnnPolicy'
   n_timesteps: !!float 1e7
   learning_rate: lin_5e-4
   clip_range: lin_0.2
