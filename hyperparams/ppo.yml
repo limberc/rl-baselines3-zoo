@@ -14,8 +14,6 @@ atari:
   ent_coef: 0.01
 procgen:
   # borrow the config from the https://github.com/openai/train-procgen/blob/master/train_procgen/train.py
-  env_wrapper:
-    - stable_baselines3.common.procgen_wrappers.procgen_wrapper
   n_envs: 8
   n_steps: 256
   n_epochs: 3

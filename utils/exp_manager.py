@@ -20,6 +20,7 @@ from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback,
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 from stable_baselines3.common.preprocessing import is_image_space, is_image_space_channels_first
+from stable_baselines3.common.procgen_wrappers import procgen_wrapper
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.utils import constant_fn
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize, \
@@ -486,17 +487,21 @@ class ExperimentManager:
 
         # On most env, SubprocVecEnv does not help and is quite memory hungry
         # therefore we use DummyVecEnv by default
-        env = make_vec_env(
-            env_id=self.env_id,
-            n_envs=n_envs,
-            seed=self.seed,
-            env_kwargs=self.env_kwargs,
-            monitor_dir=log_dir,
-            wrapper_class=self.env_wrapper,
-            vec_env_cls=self.vec_env_class,
-            vec_env_kwargs=self.vec_env_kwargs,
-            monitor_kwargs=monitor_kwargs,
-        )
+        if self._is_procgen:
+            env = procgen_wrapper(num_envs=n_envs,
+                                  env_name=self.env_id)
+        else:
+            env = make_vec_env(
+                env_id=self.env_id,
+                n_envs=n_envs,
+                seed=self.seed,
+                env_kwargs=self.env_kwargs,
+                monitor_dir=log_dir,
+                wrapper_class=self.env_wrapper,
+                vec_env_cls=self.vec_env_class,
+                vec_env_kwargs=self.vec_env_kwargs,
+                monitor_kwargs=monitor_kwargs,
+            )
 
         # Wrap the env into a VecNormalize wrapper if needed
         # and load saved statistics when present
