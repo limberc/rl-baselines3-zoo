@@ -8,7 +8,6 @@ import gym
 import numpy as np
 import seaborn
 import torch
-import procgen
 from stable_baselines3.common.utils import set_random_seed
 
 # Register custom envs
