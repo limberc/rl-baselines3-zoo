@@ -36,7 +36,7 @@ if __name__ == "__main__":  # noqa: C901
     parser.add_argument("--eval-freq", help="Evaluate the agent every n steps (if negative, no evaluation)",
                         default=10000, type=int)
     parser.add_argument("--eval-episodes", help="Number of episodes to use for evaluation", default=10, type=int)
-    parser.add_argument("--save-freq", help="Save the model every n steps (if negative, no checkpoint)", default=200,
+    parser.add_argument("--save-freq", help="Save the model every n steps (if negative, no checkpoint)", default=5000,
                         type=int)
     parser.add_argument(
         "--save-replay-buffer", help="Save the replay buffer too (when applicable)", action="store_true", default=False
@@ -52,8 +52,7 @@ if __name__ == "__main__":  # noqa: C901
     parser.add_argument(
         "--sampler",
         help="Sampler to use when optimizing hyperparameters",
-        type=str,
-        default="tpe",
+        type=str, default="tpe",
         choices=["random", "tpe", "skopt"],
     )
     parser.add_argument(
